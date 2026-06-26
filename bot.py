@@ -216,7 +216,6 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "back":
         await show_menu(update, context)
-
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
@@ -224,9 +223,16 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     print("🤖 Bot started! Send /start to become admin.")
     print("💡 Use /paylink [amount] to send payment link to customers.")
+    
     PORT = int(os.environ.get("PORT", 10000))
     WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
-    app.run_webhook(listen="0.0.0.0", port=PORT, url_path=BOT_TOKEN, webhook_url=WEBHOOK_URL)
+    
+    if WEBHOOK_URL:
+        app.run_webhook(listen="0.0.0.0", port=PORT, webhook_url=WEBHOOK_URL)
+    else:
+        app.run_polling()
+
+ 
 
 
 if __name__ == '__main__':
