@@ -83,7 +83,7 @@ async def send_payment_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # إذا مش أدمن، بعت رسالة
     if user.id not in ADMIN_IDS:
         await update.message.reply_text("🚫 غير مصرح!")
-        return
+W        return
     
     # إذا مافي args، بعت تعليمات
     if not context.args:
@@ -226,7 +226,8 @@ def main():
     print("💡 Use /paylink [amount] to send payment link to customers.")
     PORT = int(os.environ.get("PORT", 10000))
     WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
-    app.run_webhook(listen="0.0.0.0", port=PORT, webhook_url=WEBHOOK_URL)
+    app.run_webhook(listen="0.0.0.0", port=PORT, url_path=BOT_TOKEN, webhook_url=WEBHOOK_URL)
+
 
 if __name__ == '__main__':
     main()
