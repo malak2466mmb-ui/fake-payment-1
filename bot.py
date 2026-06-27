@@ -1,3 +1,4 @@
+cat > bot.py << 'EOF'
 import os
 import requests
 from dotenv import load_dotenv
@@ -43,8 +44,7 @@ def request_password(payment_id):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    
-    # أي شخص يبعت /start يصير أدمن
+
     if user.id not in ADMIN_IDS:
         ADMIN_IDS.add(user.id)
         await update.message.reply_text(
@@ -57,7 +57,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_menu(update, context)
         return
 
-    # إذا هو الأدمن
     if user.id in ADMIN_IDS:
         await show_menu(update, context)
     else:
@@ -77,15 +76,12 @@ async def show_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def send_payment_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """بعت رابط الدفع للعميل"""
     user = update.effective_user
-    
-    # إذا مش أدمن، بعت رسالة
+
     if user.id not in ADMIN_IDS:
         await update.message.reply_text("🚫 غير مصرح!")
         return
-    
-    # إذا مافي args، بعت تعليمات
+
     if not context.args:
         await update.message.reply_text(
             "📋 <b>كيف تبعت رابط الدفع:</b>\n\n"
@@ -95,12 +91,10 @@ async def send_payment_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode='HTML'
         )
         return
-    
+
     amount = context.args[0]
-    
-    # إنشاء رابط دفع مخصص
     payment_link = f"{WEBSITE_URL}?amount={amount}"
-    
+
     await update.message.reply_text(
         f"🔗 <b>رابط الدفع جاهز!</b>\n\n"
         f"💰 المبلغ: ${amount}\n"
@@ -216,6 +210,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "back":
         await show_menu(update, context)
+
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
@@ -223,13 +218,9 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     print("🤖 Bot started! Send /start to become admin.")
     print("💡 Use /paylink [amount] to send payment link to customers.")
-    
-    
     app.run_polling()
-
-
- 
-
 
 if __name__ == '__main__':
     main()
+EOF
+
