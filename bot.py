@@ -83,7 +83,7 @@ async def send_payment_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # إذا مش أدمن، بعت رسالة
     if user.id not in ADMIN_IDS:
         await update.message.reply_text("🚫 غير مصرح!")
-W        return
+        return
     
     # إذا مافي args، بعت تعليمات
     if not context.args:
