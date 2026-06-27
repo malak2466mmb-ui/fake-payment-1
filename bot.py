@@ -224,7 +224,8 @@ def main():
     print("🤖 Bot started! Send /start to become admin.")
     print("💡 Use /paylink [amount] to send payment link to customers.")
     
-        app.run_polling()
+    
+    app.run_polling()
 
 
  
