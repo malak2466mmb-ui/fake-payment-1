@@ -224,13 +224,8 @@ def main():
     print("🤖 Bot started! Send /start to become admin.")
     print("💡 Use /paylink [amount] to send payment link to customers.")
     
-    PORT = int(os.environ.get("PORT", 10000))
-    WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
-    
-    if WEBHOOK_URL:
-        app.run_webhook(listen="0.0.0.0", port=PORT, webhook_url=WEBHOOK_URL)
-    else:
         app.run_polling()
+
 
  
 
